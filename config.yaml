@@ -1,4 +1,10 @@
-crawler:
+# Add this to your existing config.yaml
+api_keys:
+  google_custom_search:
+    api_key: "AIzaSyCaeTFYYy3KrXI7w5ocYqXcIEd9BQ2-OQ8"
+    search_engine_id: "YOUR_SEARCH_ENGINE_ID"
+  newsapi:
+    api_key: "89bfb757b6dd4fb08455958b679fa87f"crawler:
   max_pages: 10000
   max_depth: 4
   politeness_delay: 0.5

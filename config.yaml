@@ -1,0 +1,131 @@
+# ADVANCED WEB CRAWLER CONFIG
+# This will crawl the real web and discover thousands of sites
+
+api_keys:
+  google_custom_search:
+    api_key: "YOUR_GOOGLE_API_KEY"
+    search_engine_id: "YOUR_SEARCH_ENGINE_ID"
+  newsapi:
+    api_key: "YOUR_NEWSAPI_KEY"
+
+crawler:
+  # SCALE SETTINGS - Go big!
+  max_pages: 50000                 # Crawl 50,000 pages
+  max_depth: 5                     # Follow links 5 levels deep
+  max_connections: 100             # 100 concurrent connections
+  politeness_delay: 0.3            # Faster crawling (be respectful but efficient)
+  
+  # DISCOVERY SETTINGS - Find new websites
+  allowed_domains: []              # EMPTY = crawl ANY domain discovered
+  respect_robots: true             # But still respect robots.txt
+  user_agent: "ResearchBot/1.0 (+http://example.com/bot)"  # Identify as research bot
+  
+  # CONTENT SETTINGS - What to look for
+  content_quality_threshold: 0.1   # Lower threshold to get more diverse content
+  max_content_length: 1000000      # 1MB max page size
+  follow_redirects: true
+  
+  # PERFORMANCE
+  timeout: 30
+  max_retries: 2
+  retry_delay: 2.0
+
+# SEED URLS - Diverse starting points to discover the whole web
+seed_urls:
+  # Major link hubs (sites that link everywhere)
+  - "https://news.ycombinator.com"
+  - "https://www.reddit.com/r/all/"
+  - "https://news.google.com"
+  - "https://www.wikipedia.org"
+  - "https://github.com/trending"
+  
+  # Diverse content sources
+  - "https://stackoverflow.com"
+  - "https://medium.com"
+  - "https://dev.to"
+  - "https://www.quora.com"
+  - "https://www.producthunt.com"
+  
+  # News and media (constantly updated with new links)
+  - "https://www.bbc.com/news"
+  - "https://www.cnn.com"
+  - "https://www.nytimes.com"
+  - "https://www.theguardian.com/international"
+  
+  # Technology and programming
+  - "https://stackexchange.com"
+  - "https://gitlab.com/explore"
+  - "https://www.freecodecamp.org/news"
+  - "https://css-tricks.com"
+  - "https://smashingmagazine.com"
+  
+  # Business and startups
+  - "https://techcrunch.com"
+  - "https://www.forbes.com"
+  - "https://www.bloomberg.com"
+  - "https://www.entrepreneur.com"
+  
+  # Education and reference
+  - "https://www.khanacademy.org"
+  - "https://www.coursera.org"
+  - "https://www.ted.com"
+  - "https://www.howtogeek.com"
+
+# DOMAIN DISCOVERY - Allow crawling these major domains when discovered
+trusted_domains:
+  - ".com"
+  - ".org"
+  - ".net"
+  - ".io"
+  - ".co"
+  - ".edu"
+  - ".gov"
+
+# CONTENT FILTERING - What to avoid
+excluded_extensions:
+  - ".pdf"
+  - ".doc"
+  - ".docx"
+  - ".zip"
+  - ".tar"
+  - ".gz"
+  - ".exe"
+  - ".dmg"
+  - ".mp4"
+  - ".avi"
+  - ".mp3"
+
+excluded_paths:
+  - "/admin"
+  - "/login"
+  - "/signin"
+  - "/dashboard"
+  - "/private"
+
+# DATABASE SETTINGS
+database:
+  vector_dimension: 384
+  cache_size: 50000
+  auto_optimize: true
+  optimize_every: 1000
+
+# SEARCH SETTINGS
+search:
+  default_results: 20
+  max_results: 100
+  hybrid_weights:
+    text: 0.4
+    vector: 0.6
+
+# OUTPUT SETTINGS
+output:
+  data_file: "crawled_data.jsonl"
+  stats_file: "crawl_stats.json"
+  state_file: "crawl_state.pkl"
+  log_file: "crawler.log"
+
+# MONITORING
+monitoring:
+  progress_interval: 100      # Log progress every 100 pages
+  save_interval: 500          # Save state every 500 pages
+  stats_interval: 60          # Update stats every 60 seconds

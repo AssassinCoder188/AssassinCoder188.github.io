@@ -1,0 +1,33 @@
+crawler:
+  max_pages: 10000
+  max_depth: 4
+  politeness_delay: 0.5
+  timeout: 30
+  max_retries: 3
+  max_connections: 100
+  user_agent: "AdvancedResearchBot/2.0"
+  respect_robots: true
+  content_quality_threshold: 0.2
+
+seed_urls:
+  - "https://en.wikipedia.org/wiki/Artificial_intelligence"
+  - "https://github.com/topics"
+  - "https://stackoverflow.com/questions"
+  - "https://news.ycombinator.com"
+  - "https://towardsdatascience.com"
+  - "https://arxiv.org"
+
+allowed_domains:
+  - "wikipedia.org"
+  - "github.com"
+  - "stackoverflow.com"
+  - "ycombinator.com"
+  - "medium.com"
+  - "arxiv.org"
+  - "towardsdatascience.com"
+
+output:
+  data_file: "crawled_data.jsonl"
+  stats_file: "crawl_stats.json"
+  state_file: "crawl_state.pkl"
+  log_file: "crawler.log"

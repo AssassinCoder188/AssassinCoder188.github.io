@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Search Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .search-btn:active {
+            transform: translateY(0);
+        }
+        
+        .results-container {
+            display: none;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .results-count {
+            font-size: 1.1rem;
+        }
+        
+        .results-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+            text-decoration: none;
+        }
+        
+        .result-title a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .result-title a:hover {
+            text-decoration: underline;
+        }
+        
+        .result-url {
+            color: #4299e1;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        
+        .result-snippet {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .result-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            display: none;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: white;
+            color: #667eea;
+        }
+        
+        .stats-panel {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: white;
+            display: none;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .page-btn {
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn.active {
+            background: white;
+            color: #667eea;
+        }
+        
+        .page-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .advanced-options {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: white;
+            display: none;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .option-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .option-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .toggle-advanced {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-advanced:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .quality-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .quality-high {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .quality-medium {
+            background: #fefcbf;
+            color: #744210;
+        }
+        
+        .quality-low {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Advanced Search Engine</h1>
+            <p>Powered by Python Web Crawler & Vector Database</p>
+        </div>
+        
+        <div class="search-box">
+            <form class="search-form" id="searchForm">
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="Enter your search query..." required>
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+        </div>
+        
+        <button class="toggle-advanced" id="toggleAdvanced">
+            ⚙️ Advanced Options
+        </button>
+        
+        <div class="advanced-options" id="advancedOptions">
+            <div class="options-grid">
+                <div class="option-group">
+                    <label class="option-label">Search Type:</label>
+                    <select class="option-select" id="searchType">
+                        <option value="hybrid">Hybrid Search</option>
+                        <option value="vector">Vector Search</option>
+                        <option value="text">Text Search</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Results per page:</label>
+                    <select class="option-select" id="resultsPerPage">
+                        <option value="10">10 results</option>
+                        <option value="25">25 results</option>
+                        <option value="50">50 results</option>
+                        <option value="100">100 results</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Min Quality Score:</label>
+                    <select class="option-select" id="minQuality">
+                        <option value="0">Any quality</option>
+                        <option value="0.3">Good (0.3+)</option>
+                        <option value="0.6">High (0.6+)</option>
+                        <option value="0.8">Excellent (0.8+)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <button class="filter-btn active" data-source="all">All Sources</button>
+            <button class="filter-btn" data-source="news">News</button>
+            <button class="filter-btn" data-source="tech">Technology</button>
+            <button class="filter-btn" data-source="web">Web</button>
+            <button class="filter-btn" data-source="academic">Academic</button>
+        </div>
+        
+        <div class="stats-panel" id="statsPanel">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalDocuments">0</div>
+                    <div class="stat-label">Total Documents</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="cacheHitRatio">0%</div>
+                    <div class="stat-label">Cache Hit Ratio</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="searchTime">0ms</div>
+                    <div class="stat-label">Search Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="vectorIndex">0</div>
+                    <div class="stat-label">Vector Index Size</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Crawling the web and searching database...</p>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="results-container" id="resultsContainer">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">0 results found</div>
+            </div>
+            <div class="results-grid" id="resultsGrid"></div>
+            
+            <div class="pagination" id="pagination">
+                <!-- Pagination buttons will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AdvancedSearchEngine {
+            constructor() {
+                this.currentResults = [];
+                this.currentPage = 1;
+                this.resultsPerPage = 10;
+                this.currentSource = 'all';
+                this.searchType = 'hybrid';
+                this.minQuality = 0;
+                this.init();
+            }
+            
+            init() {
+                this.bindEvents();
+                this.loadDatabaseStats();
+                setInterval(() => this.loadDatabaseStats(), 30000); // Update stats every 30 seconds
+            }
+            
+            bindEvents() {
+                document.getElementById('searchForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.performSearch();
+                });
+                
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.setFilter(e.target.dataset.source);
+                    });
+                });
+                
+                document.getElementById('toggleAdvanced').addEventListener('click', () => {
+                    this.toggleAdvancedOptions();
+                });
+                
+                document.getElementById('searchType').addEventListener('change', (e) => {
+                    this.searchType = e.target.value;
+                });
+                
+                document.getElementById('resultsPerPage').addEventListener('change', (e) => {
+                    this.resultsPerPage = parseInt(e.target.value);
+                    if (this.currentResults.length > 0) {
+                        this.displayResults(this.currentResults);
+                    }
+                });
+                
+                document.getElementById('minQuality').addEventListener('change', (e) => {
+                    this.minQuality = parseFloat(e.target.value);
+                    if (this.currentResults.length > 0) {
+                        this.displayResults(this.currentResults);
+                    }
+                });
+            }
+            
+            async performSearch() {
+                const query = document.getElementById('searchInput').value.trim();
+                if (!query) return;
+                
+                this.showLoading();
+                this.hideError();
+                this.hideResults();
+                
+                try {
+                    const startTime = performance.now();
+                    const results = await this.searchBackend(query);
+                    const searchTime = performance.now() - startTime;
+                    
+                    document.getElementById('searchTime').textContent = `${Math.round(searchTime)}ms`;
+                    this.displayResults(results);
+                } catch (error) {
+                    this.showError('Search failed: ' + error.message);
+                } finally {
+                    this.hideLoading();
+                }
+            }
+            
+            async searchBackend(query) {
+                // This would connect to your Python backend
+                // For now, using mock data that simulates real search results
+                
+                const response = await fetch('/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        search_type: this.searchType,
+                        max_results: 100,
+                        min_quality: this.minQuality
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Backend search failed');
+                }
+                
+                const data = await response.json();
+                return data.results;
+            }
+            
+            async loadDatabaseStats() {
+                try {
+                    const response = await fetch('/stats');
+                    if (response.ok) {
+                        const stats = await response.json();
+                        this.updateStatsPanel(stats);
+                    }
+                } catch (error) {
+                    console.log('Could not load database stats');
+                }
+            }
+            
+            updateStatsPanel(stats) {
+                document.getElementById('totalDocuments').textContent = stats.total_documents?.toLocaleString() || '0';
+                document.getElementById('cacheHitRatio').textContent = 
+                    `${Math.round((stats.cache_hit_ratio || 0) * 100)}%`;
+                document.getElementById('vectorIndex').textContent = 
+                    stats.vector_index_size?.toLocaleString() || '0';
+                
+                document.getElementById('statsPanel').style.display = 'block';
+            }
+            
+            displayResults(results) {
+                this.currentResults = results;
+                this.currentPage = 1;
+                
+                const resultsGrid = document.getElementById('resultsGrid');
+                const resultsCount = document.getElementById('resultsCount');
+                const pagination = document.getElementById('pagination');
+                
+                resultsGrid.innerHTML = '';
+                
+                if (results.length === 0) {
+                    this.showError('No results found. Try a different search query.');
+                    return;
+                }
+                
+                // Filter results by source and quality
+                const filteredResults = this.filterResults(results);
+                resultsCount.textContent = `${filteredResults.length} results found`;
+                
+                // Calculate pagination
+                const totalPages = Math.ceil(filteredResults.length / this.resultsPerPage);
+                const startIndex = (this.currentPage - 1) * this.resultsPerPage;
+                const endIndex = startIndex + this.resultsPerPage;
+                const pageResults = filteredResults.slice(startIndex, endIndex);
+                
+                // Display results
+                pageResults.forEach(result => {
+                    const card = this.createResultCard(result);
+                    resultsGrid.appendChild(card);
+                });
+                
+                // Create pagination
+                this.createPagination(totalPages);
+                
+                this.showResults();
+            }
+            
+            filterResults(results) {
+                return results.filter(result => {
+                    // Source filter
+                    if (this.currentSource !== 'all' && result.source !== this.currentSource) {
+                        return false;
+                    }
+                    
+                    // Quality filter
+                    if (result.quality_score < this.minQuality) {
+                        return false;
+                    }
+                    
+                    return true;
+                });
+            }
+            
+            createResultCard(result) {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                
+                const qualityClass = this.getQualityClass(result.quality_score);
+                const qualityText = this.getQualityText(result.quality_score);
+                
+                const metaInfo = [];
+                if (result.timestamp) metaInfo.push(new Date(result.timestamp).toLocaleDateString());
+                if (result.source) metaInfo.push(result.source);
+                if (result.word_count) metaInfo.push(`${result.word_count} words`);
+                if (result.pagerank) metaInfo.push(`PageRank: ${result.pagerank.toFixed(2)}`);
+                
+                card.innerHTML = `
+                    <div class="result-title">
+                        <a href="${result.url}" target="_blank" rel="noopener">${result.title}</a>
+                        <span class="quality-badge ${qualityClass}">${qualityText}</span>
+                    </div>
+                    <div class="result-url">${this.shortenUrl(result.url)}</div>
+                    <div class="result-snippet">${result.snippet || result.content?.substring(0, 200) + '...' || 'No description available.'}</div>
+                    <div class="result-meta">
+                        ${metaInfo.join(' • ')}
+                        ${result.score ? `• Score: ${result.score.toFixed(4)}` : ''}
+                    </div>
+                `;
+                
+                return card;
+            }
+            
+            getQualityClass(score) {
+                if (score >= 0.7) return 'quality-high';
+                if (score >= 0.4) return 'quality-medium';
+                return 'quality-low';
+            }
+            
+            getQualityText(score) {
+                if (score >= 0.7) return 'High Quality';
+                if (score >= 0.4) return 'Medium Quality';
+                return 'Low Quality';
+            }
+            
+            shortenUrl(url) {
+                try {
+                    const urlObj = new URL(url);
+                    return urlObj.hostname + urlObj.pathname.substring(0, 50) + (urlObj.pathname.length > 50 ? '...' : '');
+                } catch {
+                    return url.substring(0, 60) + (url.length > 60 ? '...' : '');
+                }
+            }
+            
+            createPagination(totalPages) {
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                
+                if (totalPages <= 1) return;
+                
+                // Previous button
+                if (this.currentPage > 1) {
+                    const prevBtn = document.createElement('button');
+                    prevBtn.className = 'page-btn';
+                    prevBtn.textContent = '← Previous';
+                    prevBtn.addEventListener('click', () => {
+                        this.currentPage--;
+                        this.displayResults(this.currentResults);
+                    });
+                    pagination.appendChild(prevBtn);
+                }
+                
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `page-btn ${i === this.currentPage ? 'active' : ''}`;
+                    pageBtn.textContent = i;
+                    pageBtn.addEventListener('click', () => {
+                        this.currentPage = i;
+                        this.displayResults(this.currentResults);
+                    });
+                    pagination.appendChild(pageBtn);
+                }
+                
+                // Next button
+                if (this.currentPage < totalPages) {
+                    const nextBtn = document.createElement('button');
+                    nextBtn.className = 'page-btn';
+                    nextBtn.textContent = 'Next →';
+                    nextBtn.addEventListener('click', () => {
+                        this.currentPage++;
+                        this.displayResults(this.currentResults);
+                    });
+                    pagination.appendChild(nextBtn);
+                }
+            }
+            
+            setFilter(source) {
+                this.currentSource = source;
+                this.currentPage = 1;
+                
+                // Update active filter button
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.source === source);
+                });
+                
+                // Re-filter results
+                if (this.currentResults.length > 0) {
+                    this.displayResults(this.currentResults);
+                }
+            }
+            
+            toggleAdvancedOptions() {
+                const options = document.getElementById('advancedOptions');
+                const toggleBtn = document.getElementById('toggleAdvanced');
+                
+                if (options.style.display === 'none' || !options.style.display) {
+                    options.style.display = 'block';
+                    toggleBtn.textContent = '⚙️ Hide Options';
+                } else {
+                    options.style.display = 'none';
+                    toggleBtn.textContent = '⚙️ Advanced Options';
+                }
+            }
+            
+            showLoading() {
+                document.getElementById('loading').style.display = 'block';
+            }
+            
+            hideLoading() {
+                document.getElementById('loading').style.display = 'none';
+            }
+            
+            showResults() {
+                document.getElementById('resultsContainer').style.display = 'block';
+            }
+            
+            hideResults() {
+                document.getElementById('resultsContainer').style.display = 'none';
+            }
+            
+            showError(message) {
+                const errorEl = document.getElementById('error');
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+            }
+            
+            hideError() {
+                document.getElementById('error').style.display = 'none';
+            }
+        }
+        
+        // Mock data for demonstration (remove when backend is connected)
+        function getMockResults(query) {
+            return Array.from({length: 47}, (_, i) => ({
+                id: `doc_${i}`,
+                url: `https://example.com/document/${i}`,
+                title: `Search Result ${i + 1} for "${query}"`,
+                content: `This is the content of document ${i + 1} discussing ${query}. It contains relevant information that matches your search query with high relevance and quality content that should be useful for your research.`,
+                snippet: `This document discusses ${query} in depth with comprehensive coverage of the topic including recent developments and practical applications.`,
+                timestamp: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
+                source: ['news', 'tech', 'web', 'academic'][Math.floor(Math.random() * 4)],
+                quality_score: Math.random() * 0.5 + 0.3, // Between 0.3 and 0.8
+                pagerank: Math.random() * 0.8 + 0.2, // Between 0.2 and 1.0
+                word_count: Math.floor(Math.random() * 5000) + 500,
+                score: Math.random() * 0.8 + 0.2 // Between 0.2 and 1.0
+            }));
+        }
+        
+        // Override searchBackend with mock data for demo
+        AdvancedSearchEngine.prototype.searchBackend = async function(query) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1200));
+            
+            return getMockResults(query);
+        };
+        
+        // Override loadDatabaseStats with mock data
+        AdvancedSearchEngine.prototype.loadDatabaseStats = async function() {
+            const mockStats = {
+                total_documents: 15427,
+                cache_hit_ratio: 0.87,
+                vector_index_size: 14289,
+                queries: 8421,
+                inserts: 15427
+            };
+            this.updateStatsPanel(mockStats);
+        };
+        
+        // Initialize the search engine when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdvancedSearchEngine();
+        });
+    </script>
+</body>
+</html>

@@ -6,8 +6,8 @@ import logging
 
 class SearchEngineCrawler:
     def __init__(self, google_api_key=None, google_search_engine_id=None):
-        self.google_api_key = google_api_key
-        self.google_search_engine_id = google_search_engine_id
+        self.google_api_key = AIzaSyCaeTFYYy3KrXI7w5ocYqXcIEd9BQ2-OQ8
+        self.google_search_engine_id = 24cd31d13bdd34858
         self.session = requests.Session()
         
         # Set up logging
